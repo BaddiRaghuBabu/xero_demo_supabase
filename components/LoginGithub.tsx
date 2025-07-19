@@ -1,28 +1,15 @@
 "use client";
 
-import { signInWithGithub } from "@/actions/auth";
-import React, { useTransition } from "react";
-import { FaGithub } from "react-icons/fa";
+import LoginGithub from "./LoginGithub"; // ✅ Make sure path is correct
+import React from "react";
 
-const LoginGithub = () => {
-  const [isPending, startTransition] = useTransition();
-
-  const handleGithubLogin = () => {
-    startTransition(async () => {
-      await signInWithGithub();
-    });
-  };
+export default function LoginPage() {
   return (
-    <div
-      onClick={handleGithubLogin}
-      className="w-full gap-4 hover:cursor-pointer mt-4 h-10 bg-gray-800 rounded-md p-4 flex justify-center items-center"
-    >
-      <FaGithub className="text-white" />
-      <p className="text-white">
-        {isPending ? "Redirecting..." : "Login with Github"}
-      </p>
+    <div className="p-10">
+      <h1 className="text-xl font-bold mb-4">Login</h1>
+
+      {/* ✅ Use the LoginGithub component */}
+      <LoginGithub />
     </div>
   );
-};
-
-export default LoginGithub;
+}

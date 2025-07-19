@@ -1,4 +1,5 @@
 "use client";
+
 import { signInWithGoogle } from "@/actions/auth";
 import React, { useTransition } from "react";
 import { FcGoogle } from "react-icons/fc";

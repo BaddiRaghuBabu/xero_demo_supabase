@@ -1,7 +1,7 @@
 // app/auth/api/callback/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import qs from 'qs'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Exchange code for tokens
+    // Step 1: Exchange code for access token
     const tokenRes = await axios.post(
       'https://identity.xero.com/connect/token',
       qs.stringify({
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const access_token = tokenRes.data.access_token
 
-    // Get Xero tenantId
+    // Step 2: Get Xero tenant ID
     const tenantRes = await axios.get('https://api.xero.com/connections', {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     const tenantId = tenantRes.data[0]?.tenantId
 
-    // Fetch invoices
+    // Step 3: Fetch invoices
     const invoiceRes = await axios.get('https://api.xero.com/api.xro/2.0/Invoices', {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -56,15 +56,20 @@ export async function GET(req: NextRequest) {
 
     const invoices = invoiceRes.data?.Invoices
 
-    // Insert into Supabase
+    // Step 4: Insert invoices into Supabase
     const { error } = await supabase.from('invoices').insert(invoices)
     if (error) {
-      throw error
+      throw new Error(error.message)
     }
 
-    return NextResponse.redirect(`${process.env.XERO_REDIRECT_URI?.replace('/auth/api/callback', '')}/success`)
-  } catch (err: any) {
-    console.error('Xero callback error:', err.response?.data || err.message)
-    return NextResponse.redirect(`${process.env.XERO_REDIRECT_URI?.replace('/auth/api/callback', '')}/error`)
+    // Redirect to success page
+    const redirectUrl = process.env.XERO_REDIRECT_URI?.replace('/auth/api/callback', '') + '/success'
+    return NextResponse.redirect(redirectUrl)
+  } catch (err) {
+    const error = err as AxiosError
+    console.error('Xero callback error:', error.response?.data || error.message)
+
+    const redirectUrl = process.env.XERO_REDIRECT_URI?.replace('/auth/api/callback', '') + '/error'
+    return NextResponse.redirect(redirectUrl)
   }
 }

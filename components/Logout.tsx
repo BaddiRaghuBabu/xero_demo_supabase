@@ -1,4 +1,3 @@
-// components/Logout.tsx (client)
 "use client";
 
 import { signOut } from "@/actions/auth";
@@ -15,11 +14,12 @@ const Logout = () => {
     setLoading(true);
 
     try {
-      await signOut(); // ✅ server-side logout
-      toast.success("Successfully logged out"); // ✅ feedback
-      router.push("/login"); // ✅ correct redirect
+      await signOut();
+      toast.success("Successfully logged out");
+      router.push("/login");
     } catch (error) {
-      toast.error("Logout failed"); // ✅ error handling
+      console.error("Logout error:", error); // 🛠️ used to avoid ESLint error
+      toast.error("Logout failed");
     } finally {
       setLoading(false);
     }
