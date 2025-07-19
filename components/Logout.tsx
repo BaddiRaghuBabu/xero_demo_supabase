@@ -1,14 +1,28 @@
+// components/Logout.tsx (client)
 "use client";
+
+import { signOut } from "@/actions/auth";
 import React, { useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Logout = () => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
 
-    setLoading(false);
+    try {
+      await signOut(); // ✅ server-side logout
+      toast.success("Successfully logged out"); // ✅ feedback
+      router.push("/login"); // ✅ correct redirect
+    } catch (error) {
+      toast.error("Logout failed"); // ✅ error handling
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

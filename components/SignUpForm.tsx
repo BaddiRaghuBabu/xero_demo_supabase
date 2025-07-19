@@ -1,64 +1,44 @@
-"use client";
+'use client';
+
 import React, { useState } from "react";
-import AuthButton from "./AuthButton";
-// import { useRouter } from "next/navigation";
+import { toast, Toaster } from "sonner";
+import { signUp } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 
 const SignUpForm = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  // const router = useRouter();
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
-    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await signUp(formData);
 
     setLoading(false);
+
+    if (result.status === "success") {
+      toast.success("Account created successfully!");
+      router.push("/login");
+    } else {
+      toast.error(result.status);
+    }
   };
+
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-200">
-            Username
-          </label>
-          <input
-            type="text"
-            placeholder="Username"
-            id="username"
-            name="username"
-            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white text-sm text-gray-700"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-200">
-            Email
-          </label>
-          <input
-            type="email"
-            placeholder="Email"
-            id="Email"
-            name="email"
-            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white text-sm text-gray-700"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-200">
-            Password
-          </label>
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            id="password"
-            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white text-sm text-gray-700"
-          />
-        </div>
-        <div className="mt-4">
-          <AuthButton type="Sign up" loading={loading} />
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 p-6 border rounded-lg max-w-md mx-auto mt-10">
+        <Toaster position="bottom-right" richColors />
+        <h2 className="text-2xl font-bold">Create Account</h2>
+        <input name="username" type="text" placeholder="Username" required className="w-full p-2 border rounded" />
+        <input name="email" type="email" placeholder="Email" required className="w-full p-2 border rounded" />
+        <input name="password" type="password" placeholder="Password" required className="w-full p-2 border rounded" />
+        <button type="submit" disabled={loading} className="w-full bg-black text-white p-2 rounded">
+          {loading ? "Signing up..." : "Sign Up"}
+        </button>
       </form>
-    </div>
+    </>
   );
 };
 

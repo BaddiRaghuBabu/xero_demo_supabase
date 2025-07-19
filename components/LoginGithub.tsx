@@ -1,5 +1,6 @@
 "use client";
 
+import { signInWithGithub } from "@/actions/auth";
 import React, { useTransition } from "react";
 import { FaGithub } from "react-icons/fa";
 
@@ -8,13 +9,13 @@ const LoginGithub = () => {
 
   const handleGithubLogin = () => {
     startTransition(async () => {
-      // await signInWithGithub();
+      await signInWithGithub();
     });
   };
   return (
     <div
       onClick={handleGithubLogin}
-      className="w-full gap-4 hover:cursor-pointer mt-6 h-12 bg-gray-800 rounded-md p-4 flex justify-center items-center"
+      className="w-full gap-4 hover:cursor-pointer mt-4 h-10 bg-gray-800 rounded-md p-4 flex justify-center items-center"
     >
       <FaGithub className="text-white" />
       <p className="text-white">
